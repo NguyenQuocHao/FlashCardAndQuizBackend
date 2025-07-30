@@ -17,6 +17,10 @@ namespace FlashCardAndQuizBackend.Data.EntityConfigurations
             builder.Property(w => w.Text)
                 .IsRequired()
                 .HasMaxLength(100);
+
+            builder.HasOne<FlashCard>()
+                .WithOne(fc => fc.LexicalUnit)
+                .HasForeignKey<FlashCard>(fc => fc.LexicalUnitId);
         }
     }
 }

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using FlashCardAndQuizBackend.Data;
 using MySqlConnector;
+using FlashCardAndQuizBackend.Repositories;
+using FlashCardAndQuizBackend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,11 @@ builder.Services.AddDbContext<DataContext>(
         .EnableDetailedErrors()
 );
 
+builder.Services.AddScoped<CardRepository>();
+builder.Services.AddScoped<LexicalUnitRepository>();
+builder.Services.AddScoped<CardService>();
+
+var app = builder.Build();
 
 
 app.UseCors(policy =>

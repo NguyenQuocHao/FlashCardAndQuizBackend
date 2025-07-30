@@ -11,7 +11,8 @@ namespace FlashCardAndQuizBackend.Data
         {
         }
 
-        public DbSet<LexicalUnit> Words { get; set; }
+        public DbSet<FlashCard> FlashCards { get; set; }
+        public DbSet<LexicalUnit> LexicalUnits { get; set; }
         public DbSet<Meaning> Meanings { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<SentenceExample> SentenceExamples { get; set; }
