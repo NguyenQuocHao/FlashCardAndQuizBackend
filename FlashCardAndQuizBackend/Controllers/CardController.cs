@@ -74,13 +74,6 @@ public record GetFlashCardResponse(
 public record UpdateWordRequest(
     int WordId, string WordContent);
 
-public record CreateMeaningRequest(
-    string Text,
-    Difficulty Difficulty,
-    Register Register,
-    Frequency Frequency,
-    SentenceExample Example);
-
 public record CreateExampleRequest(
     string LexicalUnitId,
     string Text);

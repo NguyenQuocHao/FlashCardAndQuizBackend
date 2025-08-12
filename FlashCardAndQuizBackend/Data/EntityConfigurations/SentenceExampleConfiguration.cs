@@ -16,15 +16,14 @@ namespace FlashCardAndQuizBackend.Data.EntityConfigurations
                 .IsRequired()
                 .HasMaxLength(1000);
 
-            builder.HasOne(se => se.Meaning)
-                .WithMany()
-                .HasForeignKey(se => se.MeaningId)
-                .OnDelete(DeleteBehavior.Cascade);
-            
-            // Configure relationships
-            builder.HasOne<LexicalUnit>()
-                .WithMany()
-                .OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(se => se.Meanings)
+                .WithMany(m => m.SentenceExamples)
+                .UsingEntity("Meanings_SentenceExamples");
+
+            //builder.HasOne(se => se.Meaning)
+            //    .WithMany(m => m.SentenceExamples)
+            //    .HasForeignKey(se => se.MeaningId)
+            //    .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

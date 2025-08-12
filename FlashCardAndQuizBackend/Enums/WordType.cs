@@ -2,6 +2,7 @@
 {
     public enum WordType
     {
+        // Real word types
         Noun,
         Verb,
         Adjective,
@@ -12,6 +13,8 @@
         Interjection,
         Article,
         Determiner,
+
+        // Phrase types
         Phrase,
         Idiom,
     }

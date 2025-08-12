@@ -35,9 +35,9 @@ namespace FlashCardAndQuizBackend.Data.EntityConfigurations
             //    .WithMany()
             //    .HasForeignKey(m => m.RegisterLevelId);
 
-            builder.HasOne<LexicalUnit>()
-                .WithMany()
-                .HasForeignKey(m => m.LexicalUnitId)
+            builder.HasOne(m => m.LexicalUnit)
+                .WithMany(lu => lu.Meanings)
+                .HasForeignKey(lu => lu.LexicalUnitId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // Set default values for properties

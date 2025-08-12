@@ -24,7 +24,9 @@ builder.Services.AddDbContext<DataContext>(
 
 builder.Services.AddScoped<CardRepository>();
 builder.Services.AddScoped<LexicalUnitRepository>();
+builder.Services.AddScoped<MeaningRepository>();
 builder.Services.AddScoped<CardService>();
+builder.Services.AddScoped<MeaningService>();
 
 var app = builder.Build();
 
