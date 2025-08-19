@@ -19,11 +19,6 @@ namespace FlashCardAndQuizBackend.Data.EntityConfigurations
             builder.HasMany(se => se.Meanings)
                 .WithMany(m => m.SentenceExamples)
                 .UsingEntity("Meanings_SentenceExamples");
-
-            //builder.HasOne(se => se.Meaning)
-            //    .WithMany(m => m.SentenceExamples)
-            //    .HasForeignKey(se => se.MeaningId)
-            //    .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

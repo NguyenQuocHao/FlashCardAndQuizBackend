@@ -37,6 +37,7 @@ namespace FlashCardAndQuizBackend.Controllers
         string Description,
         string Note,
         string WordType,
+        string[] Tags,
         Difficulty Difficulty = Difficulty.Moderate,
         Register Register = Register.Consultative,
         Frequency Frequency = Frequency.Occasional,
