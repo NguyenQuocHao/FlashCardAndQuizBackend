@@ -11,9 +11,9 @@ namespace FlashCardAndQuizBackend.Data.EntityConfigurations
         {
             builder.ToTable("Register_Levels");
 
-            builder.HasKey(rl => rl.FormalityLevel);
+            builder.HasKey(rl => rl.Level);
 
-            builder.Property(rl => rl.FormalityLevel)
+            builder.Property(rl => rl.Level)
                 .IsRequired();
             
             builder.Property(rl => rl.Label)
@@ -25,7 +25,7 @@ namespace FlashCardAndQuizBackend.Data.EntityConfigurations
                 .Select((register, index) => new RegisterLevel
                 {
                     //Id = index + 1,
-                    FormalityLevel = register,
+                    Level = register,
                     Label = register.ToString(),
                 })
             );
