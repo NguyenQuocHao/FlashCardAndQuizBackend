@@ -33,6 +33,14 @@ namespace FlashCardAndQuizBackend.Repositories
                 .SingleOrDefaultAsync(fc => fc.Id == id);
         }
 
+        public async Task<LexicalUnit?> GetLexicalUnit(string word)
+        {
+            return await _context.LexicalUnits
+                .Include(w => w.FlashCard)
+                .Include(w => w.Meanings)
+                .SingleOrDefaultAsync(w => w.Text == word);
+        }
+
         public async Task UpdateCard(FlashCard card)
         {
             if (card == null)

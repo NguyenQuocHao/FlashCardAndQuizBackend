@@ -47,6 +47,7 @@ namespace FlashCardAndQuizBackend.Services
 
             return cards
                 .Select(card => new GetFlashCardResponse(card.Id,
+                    card.LexicalUnitId,
                     card.LexicalUnit.Text,
                     card.CreationDate))
                 .ToList();
@@ -58,8 +59,39 @@ namespace FlashCardAndQuizBackend.Services
 
             if (card != null)
                 return new GetFlashCardResponse(card.Id,
+                    card.LexicalUnitId,
                     card.LexicalUnit.Text,
                     card.CreationDate);
+
+            return null;
+        }
+
+        public async Task<GetWordResponse?> GetWord(string word)
+        {
+            var lexicalUnit = await _cardRepo.GetLexicalUnit(word);
+
+            if (lexicalUnit != null)
+            {
+                GetFlashCardResponse card = new(lexicalUnit.FlashCardId.Value,
+                    lexicalUnit.FlashCard.LexicalUnitId,
+                    lexicalUnit.Text,
+                    lexicalUnit.FlashCard.CreationDate);
+
+                GetMeaningResponse[] meanings = lexicalUnit.Meanings
+                   .Select(meaning => new GetMeaningResponse(meaning.Id,
+                       meaning.Description,
+                       meaning.Note,
+                       meaning.Type.ToString(),
+                       meaning.Tags.Select(t => new GetTagResponse(t.Id, t.Name)).ToArray(),
+                       meaning.SentenceExamples.Select(t => new ExampleResponse(t.Id, t.Sentence)).ToArray(),
+                       meaning.DifficultyLevel,
+                       meaning.RegisterLevel,
+                       meaning.FrequencyLevel,
+                       meaning.ImportanceLevel))
+                   .ToArray();
+
+                return new GetWordResponse(card, meanings);
+            }
 
             return null;
         }

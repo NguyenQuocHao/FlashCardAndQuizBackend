@@ -9,7 +9,8 @@ namespace FlashCardAndQuizBackend.Controllers
     [Route("api/[controller]")]
     public class CardController : ControllerBase
     {
-        private readonly CardService _cardSerivce;
+        private readonly CardService _cardSerivce; 
+
         public CardController(CardService cardService)
         {
             _cardSerivce = cardService;
@@ -29,6 +30,14 @@ namespace FlashCardAndQuizBackend.Controllers
             var cards = await _cardSerivce.GetAllFlashCards();
 
             return Ok(cards);
+        }
+
+        [HttpGet("getWord/{word}")]
+        public async Task<IActionResult> GetCard(string word)
+        {
+            var card = await _cardSerivce.GetWord(word);
+
+            return Ok(card);
         }
 
         [HttpGet("get/{id}")]
@@ -68,8 +77,13 @@ public record CreateFlashCardRequest(
 
 public record GetFlashCardResponse(
     int CardId,
+    int WordId,
     string WordContent,
     DateTime CardDate);
+
+public record GetWordResponse(
+    GetFlashCardResponse Card,
+    GetMeaningResponse[] Meanings);
 
 public record UpdateWordRequest(
     int WordId, string WordContent);

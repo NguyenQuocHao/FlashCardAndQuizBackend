@@ -51,16 +51,93 @@ namespace FlashCardAndQuizBackend.Services
             }
         }
 
-        //public async Task<List<GetFlashMeaningResponse>> GetAllFlashMeanings()
-        //{
-        //    var cards = await _cardRepo.GetAllMeanings();
+        public async Task<List<GetMeaningResponse>> GetAllWordMeanings(int wordId)
+        {
+            var word = await _lexicalUnitRepo.GetLexicalUnitById(wordId, true);
 
-        //    return cards
-        //        .Select(card => new GetFlashMeaningResponse(card.Id,
-        //            card.LexicalUnit.Text,
-        //            card.CreationDate))
-        //        .ToList();
-        //}
+            return word.Meanings
+                .Select(meaning => new GetMeaningResponse(meaning.Id,
+                    meaning.Description,
+                    meaning.Note,
+                    meaning.Type.ToString(),
+                    meaning.Tags.Select(t => new GetTagResponse(t.Id, t.Name)).ToArray(),
+                    meaning.SentenceExamples.Select(t => new ExampleResponse(t.Id, t.Sentence)).ToArray(),
+                    meaning.DifficultyLevel,
+                    meaning.RegisterLevel,
+                    meaning.FrequencyLevel,
+                    meaning.ImportanceLevel))
+                .ToList();
+        }
+
+        public async Task UpdateMeanings(int wordId, UpdateMeaningsRequest request)
+        {
+            var word = await _lexicalUnitRepo.GetLexicalUnitById(wordId, true);
+
+            await DeleteMeanings(request.DeletedIds);
+
+            List<Meaning> toSaveMeanings = new();
+
+            foreach (var meaning in request.Meanings)
+            {
+                // Add meaning
+                if (meaning.Id == 0)
+                {
+                    var newMeaning = new Meaning();
+                    newMeaning.LexicalUnit = word;
+                    newMeaning.DifficultyLevel = meaning.Difficulty;
+                    newMeaning.FrequencyLevel = meaning.Frequency;
+                    newMeaning.ImportanceLevel = meaning.Importance;
+                    newMeaning.RegisterLevel = meaning.Register;
+                    newMeaning.Description = meaning.Description;
+                    newMeaning.Note = meaning.Note;
+                    newMeaning.Type = (WordType)Enum.Parse(typeof(WordType), meaning.WordType);
+                    //newMeaning.Tags = meaning.Tags;
+                    //newMeaning.SentenceExamples = new List<SentenceExample>();
+
+                    toSaveMeanings.Add(newMeaning);
+                    continue;
+                }
+
+                // Edit meaning
+                var existingMeaning = word.Meanings.FirstOrDefault(m => m.Id == meaning.Id);
+                if (existingMeaning == null)
+                {
+                    continue;
+                }
+
+                existingMeaning.Description = meaning.Description;
+                existingMeaning.Note = meaning.Note;
+                existingMeaning.Type = (WordType)Enum.Parse(typeof(WordType), meaning.WordType);
+                //existingMeaning.Tags = meaning.Tags;
+                existingMeaning.DifficultyLevel = meaning.Difficulty;
+                existingMeaning.FrequencyLevel = meaning.Frequency;
+                existingMeaning.ImportanceLevel = meaning.Importance;
+                existingMeaning.RegisterLevel = meaning.Register;
+
+                toSaveMeanings.Add(existingMeaning);
+            }
+
+            await _meaningRepository.UpdateMeanings(toSaveMeanings);
+        }
+
+        public async Task DeleteMeanings(IEnumerable<int> ids)
+        {
+            foreach (var id in ids)
+            {
+                if (id < 1)
+                {
+                    continue;
+                }
+
+                var meaning = await _meaningRepository.GetMeaningById(id);
+                if (meaning is null)
+                {
+                    continue;
+                }
+
+                await _meaningRepository.DeleteMeaning(meaning);
+            }
+        }
 
         //public async Task<GetFlashMeaningResponse?> GetMeaningById(int id)
         //{

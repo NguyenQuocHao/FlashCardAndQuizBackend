@@ -26,16 +26,20 @@ builder.Services.AddScoped<CardRepository>();
 builder.Services.AddScoped<LexicalUnitRepository>();
 builder.Services.AddScoped<MeaningRepository>();
 builder.Services.AddScoped<TagRepository>();
+builder.Services.AddScoped<GeneralRepository>();
 builder.Services.AddScoped<CardService>();
 builder.Services.AddScoped<MeaningService>();
 builder.Services.AddScoped<TagService>();
+builder.Services.AddScoped<GeneralService>();
 
 var app = builder.Build();
 
 
 app.UseCors(policy =>
 {
-    policy.AllowAnyOrigin();
+    policy.AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader();
 });
 
 // Configure the HTTP request pipeline.

@@ -29,11 +29,32 @@ namespace FlashCardAndQuizBackend.Repositories
                 .ToListAsync();
         }
 
-        public async Task<LexicalUnit?> GetLexicalUnitById(int id)
+        public async Task<LexicalUnit?> GetLexicalUnitById(int id, bool getMeaningsOnly = false)
         {
+            if (getMeaningsOnly)
+            {
+                return await _context.LexicalUnits
+                    .Include(lu => lu.Meanings)
+                    .FirstOrDefaultAsync(lu => lu.Id == id);
+            }
+
             return await _context.LexicalUnits
                 .Include(lu => lu.FlashCard)
-                .FirstOrDefaultAsync(lu => lu.Id == id);
+                .SingleOrDefaultAsync(lu => lu.Id == id);
+        }
+
+        public async Task<LexicalUnit?> GetLexicalUnit(string word, bool getMeaningsOnly = false)
+        {
+            if (getMeaningsOnly)
+            {
+                return await _context.LexicalUnits
+                    .Include(lu => lu.Meanings)
+                    .SingleAsync(lu => lu.Text == word);
+            }
+
+            return await _context.LexicalUnits
+                .Include(lu => lu.FlashCard)
+                .SingleAsync(lu => lu.Text == word);
         }
 
         public async Task<LexicalUnit?> GetLexicalUnitByContent(string content)

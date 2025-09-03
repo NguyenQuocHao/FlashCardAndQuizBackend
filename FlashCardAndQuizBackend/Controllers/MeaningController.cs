@@ -23,25 +23,51 @@ namespace FlashCardAndQuizBackend.Controllers
             return Ok("Word definition created successfully");
         }
 
-        //public async Task<IActionResult> GetAllMeanings()
-        //{
-        //    var meanings = await _meaningService.GetAllMeanings();
 
-        //    return Ok(meanings);
-        //}
+        [HttpGet("/api/word/{wordId}/meaning/getAll")]
+        public async Task<IActionResult> GetAllMeanings(int wordId)
+        {
+            var meanings = await _meaningService.GetAllWordMeanings(wordId);
 
+            return Ok(meanings);
+        }
 
+        [HttpPut("/api/word/{wordId}/meanings")]
+        public async Task<IActionResult> UpdateMeanings(int wordId, [FromBody] UpdateMeaningsRequest request)
+        {
+            await _meaningService.UpdateMeanings(wordId, request);
+
+            return Ok("Good");
+        }
     }
-
-    public record CreateMeaningRequest(int WordId, 
-        string Description,
-        string Note,
-        string WordType,
-        string[] Tags,
-        Difficulty Difficulty = Difficulty.Moderate,
-        Register Register = Register.Consultative,
-        Frequency Frequency = Frequency.Occasional,
-        Importance Importance = Importance.Medium,
-        string Example = ""
-    );
 }
+
+public record CreateMeaningRequest(int WordId,
+    string Description,
+    string Note,
+    string WordType,
+    string[] Tags,
+    Difficulty Difficulty = Difficulty.Moderate,
+    Register Register = Register.Consultative,
+    Frequency Frequency = Frequency.Occasional,
+    Importance Importance = Importance.Medium,
+    string Example = ""
+);
+
+public record UpdateMeaningsRequest(GetMeaningResponse[] Meanings,
+    int[] DeletedIds
+);
+
+public record GetMeaningResponse(int Id,
+    string Description,
+    string Note,
+    string WordType,
+    GetTagResponse[] Tags,
+    ExampleResponse[] Examples,
+    Difficulty Difficulty = Difficulty.Moderate,
+    Register Register = Register.Consultative,
+    Frequency Frequency = Frequency.Occasional,
+    Importance Importance = Importance.Medium
+);
+
+public record ExampleResponse(int ExampleId, string Content);
