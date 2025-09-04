@@ -83,17 +83,7 @@ namespace FlashCardAndQuizBackend.Services
                 if (meaning.Id == 0)
                 {
                     var newMeaning = new Meaning();
-                    newMeaning.LexicalUnit = word;
-                    newMeaning.DifficultyLevel = meaning.Difficulty;
-                    newMeaning.FrequencyLevel = meaning.Frequency;
-                    newMeaning.ImportanceLevel = meaning.Importance;
-                    newMeaning.RegisterLevel = meaning.Register;
-                    newMeaning.Description = meaning.Description;
-                    newMeaning.Note = meaning.Note;
-                    newMeaning.Type = (WordType)Enum.Parse(typeof(WordType), meaning.WordType);
-                    //newMeaning.Tags = meaning.Tags;
-                    //newMeaning.SentenceExamples = new List<SentenceExample>();
-
+                    AssignMeaning(newMeaning, meaning, word);
                     toSaveMeanings.Add(newMeaning);
                     continue;
                 }
@@ -105,19 +95,28 @@ namespace FlashCardAndQuizBackend.Services
                     continue;
                 }
 
-                existingMeaning.Description = meaning.Description;
-                existingMeaning.Note = meaning.Note;
-                existingMeaning.Type = (WordType)Enum.Parse(typeof(WordType), meaning.WordType);
-                //existingMeaning.Tags = meaning.Tags;
-                existingMeaning.DifficultyLevel = meaning.Difficulty;
-                existingMeaning.FrequencyLevel = meaning.Frequency;
-                existingMeaning.ImportanceLevel = meaning.Importance;
-                existingMeaning.RegisterLevel = meaning.Register;
+                AssignMeaning(existingMeaning, meaning);
 
                 toSaveMeanings.Add(existingMeaning);
             }
 
             await _meaningRepository.UpdateMeanings(toSaveMeanings);
+        }
+
+        private void AssignMeaning(Meaning meaning, GetMeaningResponse request, LexicalUnit word = null)
+        {
+            meaning.Description = request.Description;
+            if (word != null)
+            {
+                meaning.LexicalUnit = word;
+            }
+            meaning.Note = request.Note;
+            meaning.Type = (WordType)Enum.Parse(typeof(WordType), request.WordType);
+            //meaning.Tags = request.Tags;
+            meaning.DifficultyLevel = request.Difficulty;
+            meaning.FrequencyLevel = request.Frequency;
+            meaning.ImportanceLevel = request.Importance;
+            meaning.RegisterLevel = request.Register;
         }
 
         public async Task DeleteMeanings(IEnumerable<int> ids)

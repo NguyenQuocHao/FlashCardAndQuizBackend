@@ -20,6 +20,8 @@ namespace FlashCardAndQuizBackend.Data
         public DbSet<FrequencyLevel> FrequencyLevels { get; set; }
         public DbSet<DifficultyLevel> DifficultyLevels { get; set; }
         public DbSet<ImportanceLevel> ImportanceLevels { get; set; }
+        public DbSet<WordTypeEntity> WordTypes { get; set; }
+
 
         //public DbSet<QuizType> QuizTypes { get; set; }
         //public DbSet<QuizAttempt> QuizAttempts { get; set; }

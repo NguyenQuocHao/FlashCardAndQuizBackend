@@ -32,5 +32,11 @@ namespace FlashCardAndQuizBackend.Controllers
         {
             return Ok(await _service.GetAllRegisters());
         }
+
+        [HttpGet("word-type/get")]
+        public async Task<IActionResult> GetWordTypes()
+        {
+            return Ok(await _service.GetWordTypes());
+        }
     }
 }

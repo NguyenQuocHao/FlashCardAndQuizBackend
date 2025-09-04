@@ -1,4 +1,5 @@
 ﻿using FlashCardAndQuizBackend.Data;
+using FlashCardAndQuizBackend.Enums;
 using FlashCardAndQuizBackend.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +27,11 @@ namespace FlashCardAndQuizBackend.Repositories
         public async Task<List<RegisterLevel>> GetAllRegisters()
         {
             return await _context.RegisterLevels
+                .ToListAsync();
+        }
+        public async Task<List<WordTypeEntity>> GetWordTypes()
+        {
+            return await _context.WordTypes
                 .ToListAsync();
         }
     }

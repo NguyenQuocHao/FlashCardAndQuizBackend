@@ -1,34 +1,32 @@
-//using FlashCardAndQuizBackend.Models;
-//using Microsoft.EntityFrameworkCore;
-//using Microsoft.EntityFrameworkCore.Metadata.Builders;
-//using FlashCardAndQuizBackend.Enums;
+using FlashCardAndQuizBackend.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using FlashCardAndQuizBackend.Enums;
 
-//namespace FlashCardAndQuizBackend.Data.EntityConfigurations
-//{
-//    public class WordTypeConfiguration : IEntityTypeConfiguration<DifficultyLevel>
-//    {
-//        public void Configure(EntityTypeBuilder<DifficultyLevel> builder)
-//        {
-//            builder.ToTable("Difficulty_Levels");
+namespace FlashCardAndQuizBackend.Data.EntityConfigurations
+{
+    public class WordTypeConfiguration : IEntityTypeConfiguration<WordTypeEntity>
+    {
+        public void Configure(EntityTypeBuilder<WordTypeEntity> builder)
+        {
+            builder.ToTable("Word_Types");
 
-//            builder.HasKey(dl => dl.Level);
+            builder.HasKey(dl => dl.Code);
 
-//            builder.Property(dl => dl.Level)
-//                .IsRequired();
+            builder.Property(dl => dl.Code)
+                .IsRequired();
 
-//            builder.Property(dl => dl.Label)
-//                .IsRequired()
-//                .HasMaxLength(100);
+            builder.Property(dl => dl.Type)
+                .IsRequired();
 
-//            builder.HasData(
-//                Enum.GetValues<Difficulty>()
-//                    .Select((difficulty, index) => new DifficultyLevel
-//                    {
-//                        //Id = index + 1,
-//                        Level = difficulty,
-//                        Label = difficulty.ToString()
-//                    })
-//            );
-//        }
-//    }
-//}
+            builder.HasData(
+                Enum.GetValues<WordType>()
+                    .Select((difficulty, index) => new WordTypeEntity
+                    {
+                        Code = difficulty,
+                        Type = difficulty.ToString()
+                    })
+            );
+        }
+    }
+}

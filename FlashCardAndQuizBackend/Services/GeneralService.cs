@@ -25,5 +25,10 @@ namespace FlashCardAndQuizBackend.Services
         {
             return await _generalRepo.GetAllRegisters();
         }
+
+        public async Task<List<WordTypeEntity>> GetWordTypes()
+        {
+            return await _generalRepo.GetWordTypes();
+        }
     }
 }
