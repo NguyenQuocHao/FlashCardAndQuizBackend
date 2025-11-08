@@ -25,7 +25,7 @@ namespace FlashCardAndQuizBackend.Services
 
             LexicalUnit lexicalUnit = new()
             {
-                Text = request.Content,
+                Text = request.Content.Trim(),
             };
             await _lexicalUnitRepo.AddLexicalUnit(lexicalUnit);
 

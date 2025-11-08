@@ -22,5 +22,44 @@ namespace FlashCardAndQuizBackend.Models
 
         public IReadOnlyCollection<Tag> Tags => _tags.AsReadOnly();
         public IReadOnlyCollection<SentenceExample> SentenceExamples => _sentenceExamples.AsReadOnly();
+        public void AddTag(Tag tag)
+        {
+            if (_tags.Contains(tag))
+            {
+                return;
+            }
+
+            _tags.Add(tag);
+        }
+
+        public void DeleteTag(Tag tag)
+        {
+            if (!_tags.Contains(tag))
+            {
+                return;
+            }
+
+            _tags.Remove(tag);
+        }
+
+        public void AddExample(SentenceExample example)
+        {
+            if (_sentenceExamples.Contains(example))
+            {
+                return;
+            }
+
+            _sentenceExamples.Add(example);
+        }
+
+        public void DeleteExample(SentenceExample example)
+        {
+            if (!_sentenceExamples.Contains(example))
+            {
+                return;
+            }
+
+            _sentenceExamples.Remove(example);
+        }
     }
 }

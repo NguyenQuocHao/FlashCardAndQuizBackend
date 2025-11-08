@@ -10,10 +10,15 @@ namespace FlashCardAndQuizBackend.Services
     {
         private readonly MeaningRepository _meaningRepository;
         private readonly LexicalUnitRepository _lexicalUnitRepo;
-        public MeaningService(MeaningRepository meaningRepository, LexicalUnitRepository lexicalUnitRepo)
+        private readonly TagService _tagService;
+
+        public MeaningService(MeaningRepository meaningRepository,
+            LexicalUnitRepository lexicalUnitRepo,
+            TagService tagService)
         {
             _meaningRepository = meaningRepository;
             _lexicalUnitRepo = lexicalUnitRepo;
+            _tagService = tagService;
         }
 
         public async Task CreateMeaningAsync(CreateMeaningRequest request)
@@ -71,7 +76,7 @@ namespace FlashCardAndQuizBackend.Services
 
         public async Task UpdateMeanings(int wordId, UpdateMeaningsRequest request)
         {
-            var word = await _lexicalUnitRepo.GetLexicalUnitById(wordId, true);
+            var word = await _lexicalUnitRepo.GetLexicalUnitById(wordId);
 
             await DeleteMeanings(request.DeletedIds);
 
@@ -83,7 +88,7 @@ namespace FlashCardAndQuizBackend.Services
                 if (meaning.Id == 0)
                 {
                     var newMeaning = new Meaning();
-                    AssignMeaning(newMeaning, meaning, word);
+                    await AssignMeaning(newMeaning, meaning, word);
                     toSaveMeanings.Add(newMeaning);
                     continue;
                 }
@@ -95,7 +100,7 @@ namespace FlashCardAndQuizBackend.Services
                     continue;
                 }
 
-                AssignMeaning(existingMeaning, meaning);
+                await AssignMeaning(existingMeaning, meaning);
 
                 toSaveMeanings.Add(existingMeaning);
             }
@@ -103,7 +108,7 @@ namespace FlashCardAndQuizBackend.Services
             await _meaningRepository.UpdateMeanings(toSaveMeanings);
         }
 
-        private void AssignMeaning(Meaning meaning, GetMeaningResponse request, LexicalUnit word = null)
+        private async Task AssignMeaning(Meaning meaning, MeaningRequest request, LexicalUnit word = null)
         {
             meaning.Description = request.Description;
             if (word != null)
@@ -112,11 +117,47 @@ namespace FlashCardAndQuizBackend.Services
             }
             meaning.Note = request.Note;
             meaning.Type = (WordType)Enum.Parse(typeof(WordType), request.WordType);
-            //meaning.Tags = request.Tags;
             meaning.DifficultyLevel = request.Difficulty;
             meaning.FrequencyLevel = request.Frequency;
             meaning.ImportanceLevel = request.Importance;
             meaning.RegisterLevel = request.Register;
+            if (request.Tags.Length > 0)
+            {
+                await _tagService.UpdateTagsOfMeaning(meaning, request.Tags);
+            }
+
+            AssignExample(meaning, request);
+        }
+
+        private void AssignExample(Meaning meaning, MeaningRequest request)
+        {
+            var requestedExIds = request.Examples.Where(e => e.Id != 0).Select(e => e.Id).ToList();
+            var overlappingExs = meaning.SentenceExamples
+                .Where(e => requestedExIds.Contains(e.Id))
+                .ToList();
+
+            // Update existing examples
+            foreach (var example in overlappingExs)
+            {
+                example.Sentence = request.Examples.First(e => e.Id == example.Id).Content;
+            }
+
+            // Delete removed examples
+            var obsoleteExamples = meaning.SentenceExamples
+                .Where(e => !requestedExIds.Contains(e.Id))
+                .ToList();
+            foreach (var obsoleteExample in obsoleteExamples)
+            {
+                meaning.DeleteExample(obsoleteExample);
+            }
+
+            // Create completely new examples
+            var newExamples = request.Examples.Where(e => e.Id == 0).ToList();
+            foreach (var exampleReq in newExamples)
+            {
+                SentenceExample example = new() { Sentence = exampleReq.Content };
+                meaning.AddExample(example);
+            }
         }
 
         public async Task DeleteMeanings(IEnumerable<int> ids)

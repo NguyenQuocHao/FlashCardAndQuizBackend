@@ -49,6 +49,6 @@ namespace FlashCardAndQuizBackend.Controllers
 
 public record CreateTagRequest(string TagName);
 
-public record GetTagResponse(int TagId, string TagName);
+public record GetTagResponse(int Id, string Name);
 
 public record UpdateTagRequest(string TagName);

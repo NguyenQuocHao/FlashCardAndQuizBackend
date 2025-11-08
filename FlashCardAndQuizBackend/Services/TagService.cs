@@ -2,6 +2,7 @@
 using FlashCardAndQuizBackend.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace FlashCardAndQuizBackend.Services
 {
@@ -52,6 +53,43 @@ namespace FlashCardAndQuizBackend.Services
             {
                 tag.Name = request.TagName;
                 await _tagRepo.UpdateTag(tag);
+            }
+        }
+
+        public async Task UpdateTagsOfMeaning(Meaning meaning, IEnumerable<string> tags)
+        {
+            // Delete tags
+            List<Tag> obsoleteTags = meaning.Tags
+                .Where(t => !tags.Contains(t.Name))
+                .ToList();
+            foreach (Tag obsoleteTag in obsoleteTags)
+            {
+                meaning.DeleteTag(obsoleteTag);
+            }
+
+            // Add tags that already exist
+            List<Tag> existingTags = await _tagRepo.GetAllTags();
+            List<Tag> overlappingTags = existingTags
+                .Where(t => tags.Contains(t.Name))
+                .ToList();
+            foreach (Tag tag in overlappingTags)
+            {
+                meaning.AddTag(tag);
+            }
+
+            // Add completely new tags
+            List<string> newTagNames = tags
+                .Except(overlappingTags.Select(t => t.Name))
+                .ToList();
+            foreach (string newTag in newTagNames)
+            {
+                Tag newTagObj = new()
+                {
+                    Name = newTag,
+                };
+
+                await _tagRepo.AddTag(newTagObj);
+                meaning.AddTag(newTagObj);
             }
         }
 

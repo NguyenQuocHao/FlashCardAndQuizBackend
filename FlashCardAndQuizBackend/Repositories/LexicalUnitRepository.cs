@@ -7,7 +7,8 @@ namespace FlashCardAndQuizBackend.Repositories
     public class LexicalUnitRepository
     {
         private readonly DataContext _context;
-        public LexicalUnitRepository(DataContext context) {
+        public LexicalUnitRepository(DataContext context)
+        {
             _context = context;
         }
 
@@ -40,6 +41,10 @@ namespace FlashCardAndQuizBackend.Repositories
 
             return await _context.LexicalUnits
                 .Include(lu => lu.FlashCard)
+                .Include(lu => lu.Meanings)
+                    .ThenInclude(m => m.Tags)
+                .Include(lu => lu.Meanings)
+                    .ThenInclude(m => m.SentenceExamples)
                 .SingleOrDefaultAsync(lu => lu.Id == id);
         }
 
@@ -54,6 +59,8 @@ namespace FlashCardAndQuizBackend.Repositories
 
             return await _context.LexicalUnits
                 .Include(lu => lu.FlashCard)
+                .Include(lu => lu.Meanings)
+                .ThenInclude(m => m.Tags)
                 .SingleAsync(lu => lu.Text == word);
         }
 

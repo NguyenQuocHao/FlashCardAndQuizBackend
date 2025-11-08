@@ -54,8 +54,20 @@ public record CreateMeaningRequest(int WordId,
     string Example = ""
 );
 
-public record UpdateMeaningsRequest(GetMeaningResponse[] Meanings,
+public record UpdateMeaningsRequest(MeaningRequest[] Meanings,
     int[] DeletedIds
+);
+
+public record MeaningRequest(int Id,
+    string Description,
+    string Note,
+    string WordType,
+    string[] Tags,
+    ExampleResponse[] Examples,
+    Difficulty Difficulty = Difficulty.Moderate,
+    Register Register = Register.Consultative,
+    Frequency Frequency = Frequency.Occasional,
+    Importance Importance = Importance.Medium
 );
 
 public record GetMeaningResponse(int Id,
@@ -70,4 +82,4 @@ public record GetMeaningResponse(int Id,
     Importance Importance = Importance.Medium
 );
 
-public record ExampleResponse(int ExampleId, string Content);
+public record ExampleResponse(int Id, string Content);

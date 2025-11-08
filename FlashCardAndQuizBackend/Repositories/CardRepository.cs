@@ -38,6 +38,9 @@ namespace FlashCardAndQuizBackend.Repositories
             return await _context.LexicalUnits
                 .Include(w => w.FlashCard)
                 .Include(w => w.Meanings)
+                .   ThenInclude(m => m.Tags)
+                .Include(w => w.Meanings)
+                    .ThenInclude(m => m.SentenceExamples)
                 .SingleOrDefaultAsync(w => w.Text == word);
         }
 
@@ -55,6 +58,9 @@ namespace FlashCardAndQuizBackend.Repositories
 
         public async Task DeleteCard(FlashCard card)
         {
+            _context.LexicalUnits.Remove(card.LexicalUnit);
+            await _context.SaveChangesAsync();
+
             _context.FlashCards.Remove(card);
 
             await _context.SaveChangesAsync();
