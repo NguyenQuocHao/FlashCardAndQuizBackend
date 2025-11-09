@@ -36,8 +36,7 @@ builder.Services.AddProblemDetails();
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .WriteTo.File("Logs\\log-.txt", rollingInterval: RollingInterval.Day)
-    .WriteTo.File("E:\\Visual Studio Projects\\FlashCardAndQuizBackend\\FlashCardAndQuizBackend\\bin\\log-.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.File(@$"{AppDomain.CurrentDomain.BaseDirectory}\logs\log-.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 builder.Host.UseSerilog();

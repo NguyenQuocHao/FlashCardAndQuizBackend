@@ -16,18 +16,20 @@ namespace FlashCardAndQuizBackend.Services
 
         public async Task CreateCardAsync(CreateFlashCardRequest request)
         {
-            var existingUnit = await _lexicalUnitRepo.GetLexicalUnitByContent(request.Content);
-
-            if (existingUnit != null)
-            {
-                throw new ArgumentException("Word or word phrase already exists");
+            var existingCard = await GetCardByWord(request.Content);
+            if (existingCard != null) {
+                throw new ArgumentException("Card with the given word already exists");
             }
 
-            LexicalUnit lexicalUnit = new()
+            var lexicalUnit = await _lexicalUnitRepo.GetLexicalUnitByContent(request.Content);
+            if (lexicalUnit == null)
             {
-                Text = request.Content.Trim(),
-            };
-            await _lexicalUnitRepo.AddLexicalUnit(lexicalUnit);
+                lexicalUnit = new()
+                {
+                    Text = request.Content.Trim(),
+                };
+                await _lexicalUnitRepo.AddLexicalUnit(lexicalUnit);
+            }
 
             FlashCard flashCard = new()
             {
@@ -57,43 +59,56 @@ namespace FlashCardAndQuizBackend.Services
         {
             var card = await _cardRepo.GetCardById(id);
 
-            if (card != null)
-                return new GetFlashCardResponse(card.Id,
-                    card.LexicalUnitId,
-                    card.LexicalUnit.Text,
-                    card.CreationDate);
+            if (card == null)
+                return null;
 
-            return null;
+            return new GetFlashCardResponse(card.Id,
+                card.LexicalUnitId,
+                card.LexicalUnit.Text,
+                card.CreationDate);
+        }
+
+        public async Task<GetFlashCardResponse?> GetCardByWord(string word)
+        {
+            var card = await _cardRepo.GetCardByWord(word);
+
+            if (card == null)
+                return null;
+
+            return new GetFlashCardResponse(card.Id,
+                card.LexicalUnitId,
+                card.LexicalUnit.Text,
+                card.CreationDate);
         }
 
         public async Task<GetWordResponse?> GetWord(string word)
         {
             var lexicalUnit = await _cardRepo.GetLexicalUnit(word);
 
-            if (lexicalUnit != null)
+            if (lexicalUnit == null)
             {
-                GetFlashCardResponse card = new(lexicalUnit.FlashCardId.Value,
-                    lexicalUnit.FlashCard.LexicalUnitId,
-                    lexicalUnit.Text,
-                    lexicalUnit.FlashCard.CreationDate);
-
-                GetMeaningResponse[] meanings = lexicalUnit.Meanings
-                   .Select(meaning => new GetMeaningResponse(meaning.Id,
-                       meaning.Description,
-                       meaning.Note,
-                       meaning.Type.ToString(),
-                       meaning.Tags.Select(t => new GetTagResponse(t.Id, t.Name)).ToArray(),
-                       meaning.SentenceExamples.Select(t => new ExampleResponse(t.Id, t.Sentence)).ToArray(),
-                       meaning.DifficultyLevel,
-                       meaning.RegisterLevel,
-                       meaning.FrequencyLevel,
-                       meaning.ImportanceLevel))
-                   .ToArray();
-
-                return new GetWordResponse(card, meanings);
+                return null;
             }
 
-            return null;
+            GetFlashCardResponse card = new(lexicalUnit.FlashCardId.Value,
+                lexicalUnit.FlashCard.LexicalUnitId,
+                lexicalUnit.Text,
+                lexicalUnit.FlashCard.CreationDate);
+
+            GetMeaningResponse[] meanings = lexicalUnit.Meanings
+               .Select(meaning => new GetMeaningResponse(meaning.Id,
+                   meaning.Description,
+                   meaning.Note,
+                   meaning.Type.ToString(),
+                   meaning.Tags.Select(t => new GetTagResponse(t.Id, t.Name)).ToArray(),
+                   meaning.SentenceExamples.Select(t => new ExampleResponse(t.Id, t.Sentence)).ToArray(),
+                   meaning.DifficultyLevel,
+                   meaning.RegisterLevel,
+                   meaning.FrequencyLevel,
+                   meaning.ImportanceLevel))
+               .ToArray();
+
+            return new GetWordResponse(card, meanings);
         }
 
         public async Task<FlashCard> UpdateLexicalUnit(int cardId, UpdateWordRequest request)
