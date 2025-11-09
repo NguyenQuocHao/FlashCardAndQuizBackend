@@ -58,8 +58,9 @@ namespace FlashCardAndQuizBackend.Repositories
 
         public async Task DeleteCard(FlashCard card)
         {
-            _context.LexicalUnits.Remove(card.LexicalUnit);
-            await _context.SaveChangesAsync();
+            // TODO: Add ability to delete lexical unit
+            //_context.LexicalUnits.Remove(card.LexicalUnit);
+            //await _context.SaveChangesAsync();
 
             _context.FlashCards.Remove(card);
 

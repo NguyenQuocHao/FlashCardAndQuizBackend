@@ -68,10 +68,6 @@ namespace FlashCardAndQuizBackend.Controllers
             {
                 return NotFound(ex.Message);
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Internal error. Can't delete card.");
-            }
         }
     }
 }

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using FlashCardAndQuizBackend.Data;
-using MySqlConnector;
+using Serilog;
 using FlashCardAndQuizBackend.Repositories;
 using FlashCardAndQuizBackend.Services;
 
@@ -31,9 +31,18 @@ builder.Services.AddScoped<CardService>();
 builder.Services.AddScoped<MeaningService>();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<GeneralService>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs\\log-.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.File("E:\\Visual Studio Projects\\FlashCardAndQuizBackend\\FlashCardAndQuizBackend\\bin\\log-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 var app = builder.Build();
-
 
 app.UseCors(policy =>
 {
@@ -44,8 +53,12 @@ app.UseCors(policy =>
 
 // Configure the HTTP request pipeline.
 
+app.UseExceptionHandler();
+
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+
+Log.CloseAndFlush();
